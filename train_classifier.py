@@ -44,6 +44,7 @@ def main(classifier_type, train_file, test_file):
 
 	# Parameters
 	#-- general
+	#test
 	nchannels = 10
 	#-- deep learning
 	n_epochs = 20
