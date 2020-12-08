@@ -26,6 +26,7 @@ from keras.models import Model, load_model
 from keras.utils.np_utils import to_categorical
 from keras import backend as K
 
+from keras.callbacks import TensorBoard
 
 #-----------------------------------------------------------------------
 #-----------------------------------------------------------------------
@@ -205,7 +206,9 @@ def trainTestModel(model, X_train, Y_train_onehot, X_test, Y_test_onehot, out_mo
         #---- monitoring the minimum loss
         checkpoint = ModelCheckpoint(out_model_file, monitor='loss',
                         verbose=0, save_best_only=True, mode='min')
-        callback_list = [checkpoint]
+        #monitoring traintest loss
+        tensorboard = TensorBoard(log_dir='logs/{}'.format(time.time()))
+        callback_list = [checkpoint, tensorboard]
 
         start_train_time = time.time()
         hist = model.fit(x = X_train, y = Y_train_onehot, epochs = n_epochs,
@@ -245,7 +248,9 @@ def trainTestValModel(model, X_train, Y_train_onehot, X_val, Y_val_onehot, X_tes
 	checkpoint = ModelCheckpoint(out_model_file, monitor='val_loss',
 			verbose=0, save_best_only=True, mode='min')
 	early_stop = EarlyStopping(monitor='val_loss', min_delta=0, patience=0, verbose=0, mode='auto')
-	callback_list = [checkpoint, early_stop]
+	#tensorboard for monitoring train/val loss
+	tensorboard = TensorBoard(log_dir='logs/{}'.format(time.time()))
+	callback_list = [checkpoint, early_stop, tensorboard]
 		
 	start_train_time = time.time()
 	hist = model.fit(x = X_train, y = Y_train_onehot, epochs = n_epochs, 
