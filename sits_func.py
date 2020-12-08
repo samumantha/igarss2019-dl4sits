@@ -16,6 +16,8 @@ import math
 import random
 import itertools
 import time
+#for class imbalances
+from imblearn.under_sampling import RandomUnderSampler
 
 #-----------------------------------------------------------------------
 #-----------------------------------------------------------------------
@@ -46,8 +48,15 @@ def readSITSData(name_file):
 	
 	X_data = data.iloc[:,2:]
 	X = X_data.values
-	X = np.asarray(X, dtype='float32')
-	
+	#X = np.asarray(X, dtype='float32')
+	X = np.asarray(X, dtype='float64')
+
+	#class balancing
+	undersample = RandomUnderSampler(sampling_strategy='majority', random_state=42)
+	X, y = undersample.fit_resample(X, y)
+	polygon_ids = polygon_ids[undersample.sample_indices_]
+
+
 	return  X, polygon_ids, y
 
 #-----------------------------------------------------------------------
