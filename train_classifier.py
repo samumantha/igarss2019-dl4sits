@@ -21,8 +21,9 @@ from res_func import *
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
-from sklearn.externals import joblib
-
+#from sklearn.externals import joblib
+#above did not work for me, below does
+import joblib
 
 #-----------------------------------------------------------------------
 #-----------------------------------------------------------------------
@@ -44,11 +45,12 @@ def main(classifier_type, train_file, test_file):
 
 	# Parameters
 	#-- general
-	#test
-	nchannels = 10
+	#nchannels = 10
+	nchannels= 16
 	#-- deep learning
 	n_epochs = 20
-	batch_size = 64
+	#batch_size = 64
+	batch_size = 16
 	val_rate = 0.1
 	
 	# Reading SITS
