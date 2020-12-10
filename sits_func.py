@@ -39,10 +39,12 @@ def readSITSData(name_file):
 	
 	data = pd.read_table(name_file, sep=',', header=0) #-- one header
 	
-	y_data = data.iloc[:,0]
+	y_data = data.iloc[:,1]
+	#y_data = data.iloc[:,0]
 	y = np.asarray(y_data.values, dtype='uint8')
 	
-	polygonID_data = data.iloc[:,1]
+	polygonID_data = data.iloc[:,0]
+	#polygonID_data = data.iloc[:,1]
 	polygon_ids = polygonID_data.values
 	polygon_ids = np.asarray(polygon_ids, dtype='uint16')
 	
