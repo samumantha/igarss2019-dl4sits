@@ -24,8 +24,10 @@ from sklearn.metrics import confusion_matrix
 #from sklearn.externals import joblib
 #above did not work for me, below does
 import joblib
-
 import csv
+#for class imbalances
+from imblearn.under_sampling import RandomUnderSampler
+
 
 def save_minMaxVal(minmax_file, min_per, max_per):	
 	with open(minmax_file, 'w') as f:
@@ -41,7 +43,7 @@ def save_minMaxVal(minmax_file, min_per, max_per):
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------		
-def main(classifier_type, train_file, test_file):
+def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 
 	classif_type = ["RF", "TempCNN", "GRU-RNNbi", "GRU-RNN"]
 	if classifier_type not in classif_type:
@@ -66,7 +68,7 @@ def main(classifier_type, train_file, test_file):
 	X_train, pid_train, y_train = readSITSData(train_file)
 	X_test, pid_test, y_test = readSITSData(test_file)
 	nclasses = len(np.unique(y_train))
-		
+	
 	# Evaluated metrics
 	if classifier_type=="RF":
 		eval_label = ['OA', 'OOB_error', 'train_time', 'test_time', 'RMSE']
@@ -74,11 +76,12 @@ def main(classifier_type, train_file, test_file):
 		eval_label = ['OA', 'train_loss', 'train_time', 'test_time']
 	
 	# Output filenames
-	res_file = './resultOA-' + classifier_type + '.csv'
+	res_file = os.path.join(outdir,'resultOA-' + classifier_type + '.csv')
 	res_mat = np.zeros((len(eval_label),1))
-	model_file = './model-' + classifier_type + '.h5'
-	conf_file = './confMatrix-' + classifier_type + '.csv'
-	acc_loss_file = './trainingHistory-'+ classifier_type + '.csv' #-- only for deep learning models
+	model_file = os.path.join(outdir,modelfn)
+	#model_file = os.path.join(outdir,'/model-' + classifier_type + '.h5')
+	conf_file = os.path.join(outdir,'/confMatrix-' + classifier_type + '.csv')
+	acc_loss_file = os.path.join(outdir,'/trainingHistory-'+ classifier_type + '.csv') #-- only for deep learning models
 	
 	if os.path.isfile(res_file):
 		print("ERR: result file already exists")
@@ -124,6 +127,14 @@ def main(classifier_type, train_file, test_file):
 			y_val = y_train[final_ind[final_train:]]
 			X_train = X_train[final_ind[:final_train],:,:]
 			y_train = y_train[final_ind[:final_train]]
+
+			#balancing dataset
+			if balanced:
+
+				undersample = RandomUnderSampler(sampling_strategy='majority', random_state=42)
+				X_train, y_train = undersample.fit_resample(X_train, y_train)
+				pid_train = pid_train[undersample.sample_indices_]
+
 			y_train_one_hot = to_categorical(y_train, nclasses)
 			y_val_one_hot = to_categorical(y_val, nclasses)
 
@@ -223,11 +234,20 @@ if __name__ == "__main__":
 								help='training file')
 			parser.add_argument('--test', dest='test_file',
 								help='test_file')
+			parser.add_argument('--modelfilename', dest='modelfn')
+			parser.add_argument('--outdir', dest='outdir')
+			parser.add_argument('--balanced', dest='balanced')
+
 			args = parser.parse_args()
-			main(args.classifier, args.train_file, args.test_file)
+			if not os.path.exists(args.outdir):
+				os.makedirs(args.outdir)
+			main(args.classifier, args.train_file, args.test_file, args.modelfn,args.outdir, args.balanced)
 			print("0")
 	except(RuntimeError):
 		print >> sys.stderr
 		sys.exit(1)
+
+
+
 
 #EOF
