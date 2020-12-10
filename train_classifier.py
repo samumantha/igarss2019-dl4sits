@@ -25,6 +25,15 @@ from sklearn.metrics import confusion_matrix
 #above did not work for me, below does
 import joblib
 
+import csv
+
+def save_minMaxVal(minmax_file, min_per, max_per):	
+	with open(minmax_file, 'w') as f:
+		writer = csv.writer(f, delimiter=',')
+		writer.writerow(min_per)
+		writer.writerow(max_per)
+
+
 #-----------------------------------------------------------------------
 #-----------------------------------------------------------------------
 #---------------------			MAIN			------------------------
@@ -80,6 +89,12 @@ def main(classifier_type, train_file, test_file):
 		#---- Pre-processing train data
 		X_train = reshape_data(X_train, nchannels)
 		min_per, max_per = computingMinMax(X_train)
+		#saving minmax file for write output
+		minMaxVal_file = '.'.join(model_file.split('.')[0:-1])
+		minMaxVal_file = minMaxVal_file + '_minMax.txt'
+		min_per, max_per = computingMinMax(X_train)
+		save_minMaxVal(minMaxVal_file, min_per, max_per)
+
 		X_train =  normalizingData(X_train, min_per, max_per)
 		y_train_one_hot = to_categorical(y_train, nclasses)
 		X_test = reshape_data(X_test, nchannels)
