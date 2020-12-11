@@ -80,8 +80,8 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 	res_mat = np.zeros((len(eval_label),1))
 	model_file = os.path.join(outdir,modelfn)
 	#model_file = os.path.join(outdir,'/model-' + classifier_type + '.h5')
-	conf_file = os.path.join(outdir,'/confMatrix-' + classifier_type + '.csv')
-	acc_loss_file = os.path.join(outdir,'/trainingHistory-'+ classifier_type + '.csv') #-- only for deep learning models
+	conf_file = os.path.join(outdir,'confMatrix-' + classifier_type + '.csv')
+	acc_loss_file = os.path.join(outdir,'trainingHistory-'+ classifier_type + '.csv') #-- only for deep learning models
 	
 	if os.path.isfile(res_file):
 		print("ERR: result file already exists")
@@ -128,6 +128,8 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 			X_train = X_train[final_ind[:final_train],:,:]
 			y_train = y_train[final_ind[:final_train]]
 
+			print(X_train.shape)
+			print(y_train.shape)
 			#balancing dataset
 			if balanced:
 
@@ -183,6 +185,18 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 		predicted = rf.predict(X_test)
 		res_mat[3] = round(time.time()-start_test_time, 2)
 		print('Test time (s): ', res_mat[3,0])
+
+		importances = rf.feature_importances_
+		indices = np.argsort(importances)[::-1]
+
+		# Print the feature ranking
+		print("Feature ranking:")
+
+
+		for f in range(10):
+		#for f in range(X_train.shape[1]):
+			print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+		#print(importances)	
 		
 		#-- OA and OA_OOB
 		res_mat[0] = accuracy_score(y_test, predicted)
@@ -209,7 +223,7 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 	# Saving CM and summary res file
 	#---- saving the confusion matrix
 	class_label = ["cl0"]
-	for add in range(nclasses-1):
+	for add in range(nclasses):
 		class_label.append("cl"+str(add))
 	save_confusion_matrix(C, class_label, conf_file)
 	#---- saving res_file
@@ -241,7 +255,8 @@ if __name__ == "__main__":
 			args = parser.parse_args()
 			if not os.path.exists(args.outdir):
 				os.makedirs(args.outdir)
-			main(args.classifier, args.train_file, args.test_file, args.modelfn,args.outdir, args.balanced)
+			balanced = bool(int(args.balanced))
+			main(args.classifier, args.train_file, args.test_file, args.modelfn,args.outdir, balanced)
 			print("0")
 	except(RuntimeError):
 		print >> sys.stderr
