@@ -193,7 +193,7 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 		print("Feature ranking:")
 
 
-		for f in range(10):
+		for f in range(X_train.shape[1]):
 		#for f in range(X_train.shape[1]):
 			print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
 		#print(importances)	
