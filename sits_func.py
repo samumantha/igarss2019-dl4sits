@@ -38,6 +38,7 @@ def readSITSData(name_file):
 	"""
 	
 	data = pd.read_table(name_file, sep=',', header=0) #-- one header
+	print(data.columns)
 	
 	y_data = data.iloc[:,1]
 	#y_data = data.iloc[:,0]
@@ -46,12 +47,15 @@ def readSITSData(name_file):
 	polygonID_data = data.iloc[:,0]
 	#polygonID_data = data.iloc[:,1]
 	polygon_ids = polygonID_data.values
+	print(polygon_ids)
 	polygon_ids = np.asarray(polygon_ids, dtype='uint16')
 	
 	X_data = data.iloc[:,2:]
 	X = X_data.values
 	#X = np.asarray(X, dtype='float32')
 	X = np.asarray(X, dtype='float64')
+	print(X.shape)
+	#print(X[:10])
 
 	return  X, polygon_ids, y
 

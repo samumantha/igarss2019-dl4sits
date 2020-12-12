@@ -62,7 +62,7 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 	n_epochs = 20
 	#batch_size = 64
 	batch_size = 16
-	val_rate = 0.1
+	val_rate = 0
 	
 	# Reading SITS
 	X_train, pid_train, y_train = readSITSData(train_file)
