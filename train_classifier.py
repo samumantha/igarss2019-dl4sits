@@ -57,17 +57,25 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 	# Parameters
 	#-- general
 	#nchannels = 10
-	nchannels= 16
+	nchannels= 4
 	#-- deep learning
 	n_epochs = 20
 	#batch_size = 64
 	batch_size = 16
-	val_rate = 0
+	val_rate = 0.1
 	
 	# Reading SITS
 	X_train, pid_train, y_train = readSITSData(train_file)
 	X_test, pid_test, y_test = readSITSData(test_file)
 	nclasses = len(np.unique(y_train))
+	print(np.unique(y_train))
+	print(np.unique(y_test))
+
+	if balanced:
+
+		undersample = RandomUnderSampler(sampling_strategy='majority', random_state=42)
+		X_train, y_train = undersample.fit_resample(X_train, y_train)
+		pid_train = pid_train[undersample.sample_indices_]
 	
 	# Evaluated metrics
 	if classifier_type=="RF":
@@ -97,6 +105,10 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 		minMaxVal_file = minMaxVal_file + '_minMax.txt'
 		min_per, max_per = computingMinMax(X_train)
 		save_minMaxVal(minMaxVal_file, min_per, max_per)
+
+		print(y_train.shape)
+		print(y_test.shape)
+		print(nclasses)
 
 		X_train =  normalizingData(X_train, min_per, max_per)
 		y_train_one_hot = to_categorical(y_train, nclasses)
@@ -131,11 +143,7 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 			print(X_train.shape)
 			print(y_train.shape)
 			#balancing dataset
-			if balanced:
 
-				undersample = RandomUnderSampler(sampling_strategy='majority', random_state=42)
-				X_train, y_train = undersample.fit_resample(X_train, y_train)
-				pid_train = pid_train[undersample.sample_indices_]
 
 			y_train_one_hot = to_categorical(y_train, nclasses)
 			y_val_one_hot = to_categorical(y_val, nclasses)
