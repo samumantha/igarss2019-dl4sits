@@ -68,14 +68,22 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 	X_train, pid_train, y_train = readSITSData(train_file)
 	X_test, pid_test, y_test = readSITSData(test_file)
 	nclasses = len(np.unique(y_train))
-	print(np.unique(y_train))
-	print(np.unique(y_test))
+	print(np.unique(y_train).value_counts())
+	print(np.unique(y_test).value_counts())
+	print(len(y_train))
+	print(len(y_test))
+
+	print(X_train.shape)
 
 	if balanced:
+		print('balancing')
 
 		undersample = RandomUnderSampler(sampling_strategy='majority', random_state=42)
 		X_train, y_train = undersample.fit_resample(X_train, y_train)
 		pid_train = pid_train[undersample.sample_indices_]
+	
+	print(X_train.shape)
+
 	
 	# Evaluated metrics
 	if classifier_type=="RF":
@@ -230,7 +238,8 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 	
 	# Saving CM and summary res file
 	#---- saving the confusion matrix
-	class_label = ["cl0"]
+	#class_label = ["cl0"]
+	class_label = []
 	for add in range(nclasses):
 		class_label.append("cl"+str(add))
 	save_confusion_matrix(C, class_label, conf_file)
