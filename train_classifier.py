@@ -26,7 +26,7 @@ from sklearn.metrics import confusion_matrix
 import joblib
 import csv
 #for class imbalances
-from imblearn.under_sampling import RandomUnderSampler
+#from imblearn.under_sampling import RandomUnderSampler
 
 
 def save_minMaxVal(minmax_file, min_per, max_per):	
@@ -75,6 +75,7 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 
 	print(X_train.shape)
 
+	"""
 	if balanced:
 		print('balancing')
 
@@ -83,7 +84,7 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 		pid_train = pid_train[undersample.sample_indices_]
 	
 	print(X_train.shape)
-
+	"""
 	
 	# Evaluated metrics
 	if classifier_type=="RF":
