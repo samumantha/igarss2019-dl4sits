@@ -207,9 +207,9 @@ def trainTestModel(model, X_train, Y_train_onehot, X_test, Y_test_onehot, out_mo
         checkpoint = ModelCheckpoint(out_model_file, monitor='loss',
                         verbose=1, save_best_only=True, mode='min')
         #monitoring traintest loss
-        tensorboard = TensorBoard(log_dir='logs/{}'.format(time.time()))
-        callback_list = [checkpoint, tensorboard]
-        #callback_list = [checkpoint]
+        #tensorboard = TensorBoard(log_dir='logs/{}'.format(time.time()))
+        #callback_list = [checkpoint, tensorboard]
+        callback_list = [checkpoint]
 
         start_train_time = time.time()
         hist = model.fit(x = X_train, y = Y_train_onehot, epochs = n_epochs,
@@ -250,9 +250,9 @@ def trainTestValModel(model, X_train, Y_train_onehot, X_val, Y_val_onehot, X_tes
 			verbose=1, save_best_only=True, mode='min')
 	early_stop = EarlyStopping(monitor='val_loss', min_delta=0, patience=0, verbose=0, mode='auto')
 	#tensorboard for monitoring train/val loss
-	tensorboard = TensorBoard(log_dir='logs/{}'.format(time.time()))
+	#tensorboard = TensorBoard(log_dir='logs/{}'.format(time.time()))
+	callback_list = [checkpoint, early_stop]
 	#callback_list = [checkpoint, early_stop, tensorboard]
-	callback_list = [checkpoint, early_stop, tensorboard]
 
 
 	start_train_time = time.time()
