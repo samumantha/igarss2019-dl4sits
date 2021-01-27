@@ -25,6 +25,22 @@ import time
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
+def readSITSData_npy(name_file):
+	
+	data = np.load(name_file)
+	print('ye')
+	print(data.shape)
+	y = data[:,0]
+	y = y.astype('int')
+	polygon_ids = data[:,1]
+	polygon_ids = polygon_ids.astype('int')
+
+	X = data[:,2:]
+	print(X.shape)
+
+	return X, polygon_ids,y
+
+
 def readSITSData(name_file):
 	"""
 		Read the data contained in name_file
@@ -40,12 +56,12 @@ def readSITSData(name_file):
 	data = pd.read_table(name_file, sep=',', header=0) #-- one header
 	print(data.columns)
 	
-	y_data = data.iloc[:,1]
-	#y_data = data.iloc[:,0]
+	#y_data = data.iloc[:,1]
+	y_data = data.iloc[:,0]
 	y = np.asarray(y_data.values, dtype='uint8')
 	
-	polygonID_data = data.iloc[:,0]
-	#polygonID_data = data.iloc[:,1]
+	#polygonID_data = data.iloc[:,0]
+	polygonID_data = data.iloc[:,1]
 	polygon_ids = polygonID_data.values
 	print(polygon_ids)
 	polygon_ids = np.asarray(polygon_ids, dtype='uint16')
@@ -75,6 +91,7 @@ def reshape_data(X, nchannels):
 
 #-----------------------------------------------------------------------
 def computingMinMax(X, per=2):
+	print(X.shape)
 	min_per = np.percentile(X, per, axis=(0,1))
 	max_per = np.percentile(X, 100-per, axis=(0,1))
 	return min_per, max_per

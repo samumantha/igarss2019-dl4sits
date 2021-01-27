@@ -26,15 +26,14 @@ from sklearn.metrics import confusion_matrix
 import joblib
 import csv
 #for class imbalances
-#from imblearn.under_sampling import RandomUnderSampler
+from imblearn.under_sampling import RandomUnderSampler
 
-
+#added by Samumnatha to be able to go back to map with TempCNN
 def save_minMaxVal(minmax_file, min_per, max_per):	
 	with open(minmax_file, 'w') as f:
 		writer = csv.writer(f, delimiter=',')
 		writer.writerow(min_per)
 		writer.writerow(max_per)
-
 
 #-----------------------------------------------------------------------
 #-----------------------------------------------------------------------
@@ -57,7 +56,7 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 	# Parameters
 	#-- general
 	#nchannels = 10
-	nchannels= 4
+	nchannels= 16
 	#-- deep learning
 	n_epochs = 20
 	#batch_size = 64
@@ -65,17 +64,17 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 	val_rate = 0.1
 	
 	# Reading SITS
-	X_train, pid_train, y_train = readSITSData(train_file)
-	X_test, pid_test, y_test = readSITSData(test_file)
+	X_train, pid_train, y_train = readSITSData_npy(train_file)
+	X_test, pid_test, y_test = readSITSData_npy(test_file)
 	nclasses = len(np.unique(y_train))
-	print(np.unique(y_train).value_counts())
-	print(np.unique(y_test).value_counts())
+	print(len(np.unique(y_train)))
+	print(np.unique(y_test))
 	print(len(y_train))
 	print(len(y_test))
 
 	print(X_train.shape)
 
-	"""
+	
 	if balanced:
 		print('balancing')
 
@@ -84,7 +83,7 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 		pid_train = pid_train[undersample.sample_indices_]
 	
 	print(X_train.shape)
-	"""
+	
 	
 	# Evaluated metrics
 	if classifier_type=="RF":
@@ -108,6 +107,8 @@ def main(classifier_type, train_file, test_file, modelfn, outdir, balanced):
 	if dl_flag:			#-- deep learning approaches
 		#---- Pre-processing train data
 		X_train = reshape_data(X_train, nchannels)
+		print(X_train.shape)
+		print(nchannels)
 		min_per, max_per = computingMinMax(X_train)
 		#saving minmax file for write output
 		minMaxVal_file = '.'.join(model_file.split('.')[0:-1])
